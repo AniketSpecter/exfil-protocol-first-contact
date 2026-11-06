@@ -18,4 +18,17 @@ The public edition was installed and built from a separate allowlisted checkout 
 
 The inventory scan is a bounded automated check, not a claim that any scanner can prove the absence of every possible secret. Publication uses only the reviewed file list and a fresh Git history. Physical Android/iOS Safari, human balance, ergonomics and accessibility testing remain pending.
 
-Hosted deployment verification is recorded after GitHub Pages reports success.
+## Hosted verification
+
+The public repository is [AniketSpecter/exfil-protocol-first-contact](https://github.com/AniketSpecter/exfil-protocol-first-contact). GitHub Actions' build and deploy jobs completed successfully. The game is live at [EXFIL PROTOCOL: FIRST CONTACT](https://aniketspecter.github.io/exfil-protocol-first-contact/).
+
+Six hosted browser checks passed:
+
+1. HTTPS title/menu load at the standard Pages URL; development harness absent.
+2. Credits show Aniket [UGZ], Auto Sprite AI and AI-assisted programming, without internal file/edition instructions.
+3. Desktop raid renders and accepts input, knife selection, Q switch and pause.
+4. The 800x360 menu fits, and touch-layout preferences save without click-through.
+5. Actual touch firing reduces ammunition; the phone selector equips the knife and pause responds.
+6. No failed resources or uncaught exceptions; the tested game runtime requested only its own GitHub Pages origin.
+
+These are browser-automation checks of the hosted release. They do not replace physical-device or human usability testing.
