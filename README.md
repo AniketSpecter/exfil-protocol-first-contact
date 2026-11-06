@@ -63,7 +63,7 @@ Your loadout has three slots: primary, secondary and knife. Bots drop the gun th
 - Responsive menus and persistent phone action bars.
 - Local saves, XP, evidence archive and a signal-scrambler unlock.
 
-The public edition uses code-rendered gameplay art and synthesized audio. It does not require original game installations or ship their imported recordings. See [Attribution](ATTRIBUTION.md) for creator and tool credits.
+The public edition now includes the selected tactical operators, weapon sprites, terrain and props used in the local build, plus EXFIL/Counter-Strike ocean, boat, weapon, footstep, bot and operator audio. The supplied EXFIL title theme plays on menu screens after the first interaction and fades out on deployment. See [Attribution](ATTRIBUTION.md) for creator and tool credits.
 
 ## Run locally
 
@@ -80,11 +80,19 @@ Open the local URL printed by Vite. For a production build:
 
 ```sh
 npm test
-npm run build:portable
-node scripts/vite.mjs preview --portable
+npm run build
+npm run preview
 ```
 
 Use an HTTP server; opening index.html directly from the file system will not load the module build. If browser graphics fail, append `?renderer=canvas` to the game URL. Fullscreen requires a user tap/click and browser support.
+
+## Media profiles
+
+`npm run build` creates the full-media edition used by GitHub Pages. It contains 35 selected graphics, 31 sound cues (26 gameplay/voice cues and five UI sounds) in a compiled audio bank and the supplied menu theme. `public/assets/game/catalog.json` contains only relative runtime paths, cue boundaries and file hashes. It contains no source-machine paths.
+
+`npm run build:portable` is an optional edition with code-rendered replacement sprites/terrain and synthesized effects. It excludes the selected game media and menu score. Preview that edition with `node scripts/vite.mjs preview --portable`.
+
+Audio On/Off controls effects, voices and ambience. Music On/Off independently controls the menu soundtrack. Both preferences save in the browser. Browser autoplay rules require a first tap, click or keypress. Menu music fades when deploying, returns in menus, and pauses when the tab is hidden. Physical device audio behavior still needs testing.
 
 ## Code overview
 
@@ -98,12 +106,12 @@ Physical Android/iOS testing, human balance studies and accessibility review rem
 
 ## Privacy and deployment
 
-Mission progress, mute preference and touch layout stay in local browser storage. GitHub Pages serves static files; the game has no account system, application server or third-party analytics. A different browser or origin has a separate save.
+Mission progress, audio/music preferences and touch layout stay in local browser storage. GitHub Pages serves static files; the game has no account system, application server or third-party analytics. A different browser or origin has a separate save.
 
-The Pages workflow installs locked dependencies, runs checks, builds the public edition and deploys only `dist-portable`. Original game media, local recordings, import manifests, workstation paths, private assessment documents and test captures are excluded from this repository. [Deployment instructions](docs/DEPLOYMENT.md).
+The Pages workflow installs locked dependencies, runs checks, builds the full-media edition and deploys only `dist`. Only selected runtime graphics, the compiled sound bank and menu score are included. Full source-game installations, original sound-pack folders, private import manifests, workstation paths, private assessment documents and test captures remain excluded. [Deployment instructions](docs/DEPLOYMENT.md).
 
 ## Credits
 
-Creative direction, EXFIL concept and story: **Aniket [UGZ]**. Inspired by the tactical atmosphere of Counter-Strike 1.6 and the geography of de_mon by MaMuS. Character and weapon designs were developed with Auto Sprite AI. AI-assisted programming supported gameplay implementation, interface development and automated testing, under the creative direction of Aniket [UGZ]. The lightweight browser edition renders gameplay sprites in code and synthesizes its sound.
+Creative direction, EXFIL concept and story: **Aniket [UGZ]**. Inspired by the tactical atmosphere of Counter-Strike 1.6 and the geography of de_mon by MaMuS. Character and weapon designs were developed with Auto Sprite AI. AI-assisted programming supported gameplay implementation, interface development and automated testing, under the creative direction of Aniket [UGZ]. The default browser edition uses the restored game media; an optional replacement profile renders fallback sprites in code and synthesizes its effects.
 
 This is an independent project, not an official Counter-Strike or Valve release. Dependencies and third-party items keep their respective licenses. Project code and creator-supplied artwork are published for play and review; no general reuse license is granted. See [Rights](RIGHTS.md).

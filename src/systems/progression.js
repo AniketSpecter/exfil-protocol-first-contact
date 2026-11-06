@@ -6,6 +6,7 @@ export const emptySave = () => ({
   evidence: [],
   signalFilter: false,
   muted: false,
+  musicMuted: false,
   completedMissions: [],
   lastMission: "landing",
 });
@@ -48,6 +49,7 @@ export function validateSave(raw) {
     lastMission: raw.lastMission === "frequency" ? "frequency" : "landing",
     signalFilter: raw.signalFilter === true || raw.completions > 0,
     muted: raw.muted === true,
+    musicMuted: raw.musicMuted === true,
   };
 }
 export class Progression {

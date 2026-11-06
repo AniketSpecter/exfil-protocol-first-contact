@@ -5,7 +5,7 @@ This is a static client-side game. Vite bundles Phaser and ES modules; GitHub Pa
 | Module                        | Responsibility                                                                   |
 | ----------------------------- | -------------------------------------------------------------------------------- |
 | `src/main.js`                 | Bootstraps Phaser, browser storage, audio, UI, visibility and rotation handling  |
-| `src/scenes/Boot.js`          | Generates browser gameplay textures and prepares the island                      |
+| `src/scenes/Boot.js`          | Loads selected runtime sprites and textures, generates fallback art when requested, and prepares the island                      |
 | `src/scenes/Raid.js`          | Raid lifecycle, input, combat, objectives, pickups, recovery, travel and results |
 | `src/data/mission.js`         | Authored walkable polygons, cover, docks, missions, patrol routes and loot       |
 | `src/data/weapons.js`         | Weapon definitions, slot assignments and starting loadout                        |
@@ -14,7 +14,7 @@ This is a static client-side game. Vite bundles Phaser and ES modules; GitHub Pa
 | `src/systems/companion.js`    | Follow, spacing, combat support and safe revival                                 |
 | `src/systems/progression.js`  | Versioned save validation, unique evidence rewards and mission unlocks           |
 | `src/systems/touch-layout.js` | Validated normalized preferences and drag/resize/opacity editor                  |
-| `src/systems/audio.js`        | Web Audio effects, ambience and mute preference                                  |
+| `src/systems/audio.js`        | Runtime audio-bank decoding, menu score fades, effects, ambience and mute preference                                  |
 | `src/systems/display.js`      | Fullscreen requests, failure feedback and viewport resizing                      |
 | `src/ui.js`                   | Screen navigation, briefing, touch controls, HUD, Credits and results            |
 | `src/ui-journey.js`           | Scripted ocean crossing presentation and progress                                |

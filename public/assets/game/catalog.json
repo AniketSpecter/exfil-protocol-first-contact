@@ -1,0 +1,319 @@
+{
+  "version": 1,
+  "profile": "full-media",
+  "artwork": [
+    {
+      "file": "actors/ct1.png",
+      "bytes": 3518,
+      "sha256": "a42b52749e4a716d0b62ef300d9c3d2bc409eaae0a25c815bb91797b216cde48"
+    },
+    {
+      "file": "actors/ct2.png",
+      "bytes": 3787,
+      "sha256": "19b238e548bd0e01577d86ad0211738fc693e10001c0814a8858c9c3c9eb7cf9"
+    },
+    {
+      "file": "actors/ct3.png",
+      "bytes": 3345,
+      "sha256": "1cc194707c76a10e354562cd57eefd86b919642b022a49e895b31bf31eb8136c"
+    },
+    {
+      "file": "actors/ct4.png",
+      "bytes": 3285,
+      "sha256": "f191cd061add838f14c597a759ca7461d4115d951e65d1bfd4d7b375e765d17b"
+    },
+    {
+      "file": "actors/legs.png",
+      "bytes": 533,
+      "sha256": "1e664710df70bedd3ee1becd4785efffa36625c649ab89423a8489ac19b270b4"
+    },
+    {
+      "file": "actors/t1.png",
+      "bytes": 4066,
+      "sha256": "fa6dd912251b07565e9e9dd820e06a422124e1808297f2111ca64af5560d9f45"
+    },
+    {
+      "file": "actors/t2.png",
+      "bytes": 3622,
+      "sha256": "4024880a34a073d50ca2c17d30fe0c82f12b2e03eba260dd2426f1eaae79b02d"
+    },
+    {
+      "file": "actors/t3.png",
+      "bytes": 4259,
+      "sha256": "445b16659cfafc9b71e53ada6d2a0b3c2257275a56fd060fe533dbebcd28f217"
+    },
+    {
+      "file": "actors/t4.png",
+      "bytes": 4443,
+      "sha256": "05113bb06b19d143ac3c85c895f8d9b8d77a7125a8695bfe5bf9f8e303ee055a"
+    },
+    {
+      "file": "props/crate-prop.png",
+      "bytes": 7611,
+      "sha256": "69f7133747d1aed2e56ea81576e4efc730c192e874dc2e302d43d07aab9eb994"
+    },
+    {
+      "file": "props/roof.png",
+      "bytes": 116757,
+      "sha256": "0bf4418a32025348db2af22e8474eb17d6cb3474de19fc1df683cf54d2eb5e50"
+    },
+    {
+      "file": "props/tree.png",
+      "bytes": 6543,
+      "sha256": "7870bdae82475c47df61762337561abf708f52c401d1f1a124da7f55041d9760"
+    },
+    {
+      "file": "props/tree2.png",
+      "bytes": 11915,
+      "sha256": "fddb1ae9737865bd3fa5fdf22a960d374fe8160d216fd82ddb5f52731e12bb2a"
+    },
+    {
+      "file": "props/truck.png",
+      "bytes": 14859,
+      "sha256": "4b59e9ab121fe1fa50c2ab5a8791c50a2e1fbc0f22f3e9a4a3931ae817de1c21"
+    },
+    {
+      "file": "terrain/concrete.png",
+      "bytes": 1700,
+      "sha256": "96b668d602e6b6bf9ab51b896e1110909d41ca2bf4c9ef56229b228dd460f626"
+    },
+    {
+      "file": "terrain/crate.png",
+      "bytes": 1511,
+      "sha256": "06748d0008618ef215002c2f39f87c53e27760ce2cb3ed869df47ca83f2b93a5"
+    },
+    {
+      "file": "terrain/grass.png",
+      "bytes": 2289,
+      "sha256": "dc5ea806893add8b66b15a2e9e8e4a7da74df32e74f9fec1dea8db9da65af7c1"
+    },
+    {
+      "file": "terrain/metal.png",
+      "bytes": 1892,
+      "sha256": "d6575aabfa252c7bea277836bf3c59649c9517b5dad73a7ff8886c7d4a896dc4"
+    },
+    {
+      "file": "terrain/sand.png",
+      "bytes": 2176,
+      "sha256": "b5086c858bd53e1f0d3d6b0ce9cc841f8fa7234c5ba7269c0a994d3d10462930"
+    },
+    {
+      "file": "terrain/stone.png",
+      "bytes": 2567,
+      "sha256": "e79f0f3a49674d4bc57fa7d745278b5c835bd6b4bbd184f194ece29e39f7033e"
+    },
+    {
+      "file": "terrain/wood.png",
+      "bytes": 722,
+      "sha256": "f86f239f840662b2677c07b680597fb9e73a796ac471316096bfa162dacb18c0"
+    },
+    {
+      "file": "ui/ak47.png",
+      "bytes": 904,
+      "sha256": "69a05a0283ee9faadeeab23d1a5c687c437ce4c337f7e06584fe8f8e0dbab61e"
+    },
+    {
+      "file": "ui/ct1.png",
+      "bytes": 1100,
+      "sha256": "552e88e8a46c8e79a58c9dc7d99dc048bab2b92c8f6350a2ea37a68753e010c5"
+    },
+    {
+      "file": "ui/ct2.png",
+      "bytes": 1197,
+      "sha256": "fc97fc47b3fa481089e84bcfe7080ca999563ad2e50822826705d15616082b1d"
+    },
+    {
+      "file": "ui/ct3.png",
+      "bytes": 1059,
+      "sha256": "4872b87932976cee6629085af26a61ffb1f6acaaa80542ebb1ccdb01adddaa0e"
+    },
+    {
+      "file": "ui/ct4.png",
+      "bytes": 1052,
+      "sha256": "e2e588206c2fb370b39ef09207f1b75f478dbc62fd67e1b9eb56441575bd1b3c"
+    },
+    {
+      "file": "ui/m4a1.png",
+      "bytes": 1050,
+      "sha256": "150cfcf42ef4c9588d587608af464842b256d4cc880a467631fe5f54ae39a214"
+    },
+    {
+      "file": "ui/t1.png",
+      "bytes": 1176,
+      "sha256": "54ad1883314e47af4e3113250612bc1f71254bdc4a8c0126017d30a33144c824"
+    },
+    {
+      "file": "ui/t2.png",
+      "bytes": 1175,
+      "sha256": "610eb0f8d213769105b58f2d56cddbef07678591e0bb1925458c19d5767ed8d6"
+    },
+    {
+      "file": "ui/t3.png",
+      "bytes": 1313,
+      "sha256": "34c59c2982770bb1c8ffff073ee89ec632b65d4323d3abf0173d203a6bd87482"
+    },
+    {
+      "file": "ui/t4.png",
+      "bytes": 1254,
+      "sha256": "f9a29ba4a99aba437bd84454f08d31e6bc2164f605ebe36deb3cb7463ff021d6"
+    },
+    {
+      "file": "ui/usp.png",
+      "bytes": 530,
+      "sha256": "4f33236b19a8abe4c0d8fcbb53da9e64d464a91f6acf6c0a437ce62e2973df3e"
+    },
+    {
+      "file": "weapons/ak47.png",
+      "bytes": 389,
+      "sha256": "085a8fc75a3366c0e471a6c06ca3eec3c74ba847e49aa0a0ec8105db7a2063b7"
+    },
+    {
+      "file": "weapons/m4a1.png",
+      "bytes": 327,
+      "sha256": "f653a3af9859fb304760df0f2cac540eac8d4a580027008eebd01392cf10e7f2"
+    },
+    {
+      "file": "weapons/usp.png",
+      "bytes": 211,
+      "sha256": "1ecd6adb50d8d582c36334e5c3588d80f219bfb31231d4e34a6435f0ebbcf6b3"
+    }
+  ],
+  "audio": {
+    "file": "runtime-audio.wav",
+    "sampleRate": 22050,
+    "cues": {
+      "ak": {
+        "startFrame": 0,
+        "frames": 25931
+      },
+      "boat": {
+        "startFrame": 28577,
+        "frames": 88022
+      },
+      "bolt": {
+        "startFrame": 119245,
+        "frames": 8055
+      },
+      "clip-in": {
+        "startFrame": 129946,
+        "frames": 6603
+      },
+      "clip-out": {
+        "startFrame": 139195,
+        "frames": 12491
+      },
+      "death": {
+        "startFrame": 154332,
+        "frames": 21106
+      },
+      "enemy-contact": {
+        "startFrame": 178084,
+        "frames": 15653
+      },
+      "enemy-lost": {
+        "startFrame": 196383,
+        "frames": 15655
+      },
+      "enemy-search": {
+        "startFrame": 214684,
+        "frames": 27361
+      },
+      "hit": {
+        "startFrame": 244691,
+        "frames": 6976
+      },
+      "m4": {
+        "startFrame": 254313,
+        "frames": 18660
+      },
+      "ocean": {
+        "startFrame": 275619,
+        "frames": 212484
+      },
+      "radio-ack": {
+        "startFrame": 490749,
+        "frames": 13377
+      },
+      "step1": {
+        "startFrame": 506772,
+        "frames": 7534
+      },
+      "step2": {
+        "startFrame": 516952,
+        "frames": 6482
+      },
+      "team-cover": {
+        "startFrame": 526080,
+        "frames": 16043
+      },
+      "team-deploy": {
+        "startFrame": 544769,
+        "frames": 40708
+      },
+      "team-extract": {
+        "startFrame": 588123,
+        "frames": 61364
+      },
+      "team-failed": {
+        "startFrame": 652133,
+        "frames": 57437
+      },
+      "team-hold": {
+        "startFrame": 712216,
+        "frames": 51055
+      },
+      "team-kill": {
+        "startFrame": 765917,
+        "frames": 60659
+      },
+      "team-objective": {
+        "startFrame": 829222,
+        "frames": 58805
+      },
+      "team-spotted": {
+        "startFrame": 890673,
+        "frames": 30531
+      },
+      "team-success": {
+        "startFrame": 923850,
+        "frames": 51140
+      },
+      "ui-back": {
+        "startFrame": 977636,
+        "frames": 4713
+      },
+      "ui-confirm": {
+        "startFrame": 984995,
+        "frames": 3839
+      },
+      "ui-denied": {
+        "startFrame": 991480,
+        "frames": 5528
+      },
+      "ui-hover": {
+        "startFrame": 999654,
+        "frames": 9101
+      },
+      "ui-toggle": {
+        "startFrame": 1011401,
+        "frames": 9729
+      },
+      "usp": {
+        "startFrame": 1023776,
+        "frames": 15682
+      },
+      "wood1": {
+        "startFrame": 1042104,
+        "frames": 12147
+      }
+    },
+    "bytes": 2113838,
+    "sha256": "5f3a1d9add6b74fa415ed57a8d1c6b707d6155e924ebae28eea2e61189e92690"
+  },
+  "notice": "Runtime media for EXFIL PROTOCOL: FIRST CONTACT. Original third-party rights retained.",
+  "menuMusic": {
+    "file": "menu-theme.mp3",
+    "bytes": 1746547,
+    "sha256": "c6693f5afce94c2a3f79ab11a896481d2d72f5d4d1518d0f1a8e37e975e4002a"
+  }
+}

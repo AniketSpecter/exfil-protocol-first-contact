@@ -1,0 +1,25 @@
+THIRD-PARTY GAME MEDIA NOTICES
+
+Selected 2D operators, firearms, terrain, props and effects were adapted from
+the supplied CS2D installation. Original notice:
+
+CS2D is freeware
+Copyright (c) 2002-2026 Unreal Software
+www.UnrealSoftware.de
+www.CS2D.com
+
+Using Sounds/Textures from the original Counter-Strike
+Copyright (c) Valve Corporation
+
+The EXFIL/Counter-Strike sound library supplies selected ocean, transport,
+radio and bot recordings. Original rights remain with their respective
+creators. Inclusion is not a declaration of CC0 or an asset-resale license.
+
+Selected operator lines are from Military Voice Pack 2, VOiD1 Gaming.
+The original game-asset license accompanies this notice as
+Military-Voice-Pack-2-License.pdf. Recordings are compiled into the game's
+runtime audio bank, not included as the original source sound-pack folders.
+
+Aniket [UGZ] retains the EXFIL concept, creative direction and original
+project materials. Original knife art, boat journey, UI and generated
+fallback media were developed for this prototype.

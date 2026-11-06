@@ -96,7 +96,7 @@ function defaults(width, height) {
       w: small ? 55 : 85,
       h: 44,
     },
-    "pause-button": { x: width - 195, y: 0, w: 78, h: 44 },
+    "pause-button": { x: width - 264, y: 0, w: 78, h: 44 },
   };
 }
 export function controlRect(id, layout, width, height) {
@@ -305,7 +305,17 @@ export class TouchLayout {
     };
     // Pointer-up remains reliable immediately after a captured drag, even when
     // the browser suppresses its compatibility click. Ignore the later click.
-    const action = (id, run) => {
+    const action = (id, callback) => {
+      const run = (event) => {
+        ui.audio.uiSound(
+          id.includes("cancel")
+            ? "back"
+            : id.includes("collapse")
+              ? "toggle"
+              : "confirm",
+        );
+        callback(event);
+      };
       const button = overlay.querySelector(id);
       let touched = -Infinity;
       button.onpointerup = (e) => {

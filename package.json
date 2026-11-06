@@ -1,6 +1,6 @@
 {
   "name": "exfil-protocol-first-contact",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "private": true,
   "type": "module",
   "scripts": {
@@ -24,7 +24,9 @@
     "test:touch-editor": "node scripts/prepare-qa.mjs && node tests/touch-editor.mjs",
     "test:weapons-journey": "node scripts/prepare-qa.mjs && node tests/weapons-journey.mjs",
     "test:mobile-pages": "node scripts/prepare-qa.mjs && node tests/mobile-pages.mjs",
-    "audit:public": "node scripts/audit-public.mjs"
+    "audit:public": "node scripts/audit-public.mjs",
+    "test:media-audio": "node scripts/prepare-qa.mjs && node tests/media-audio.mjs",
+    "test:hosted-media": "node scripts/prepare-qa.mjs && node tests/hosted-media.mjs"
   },
   "dependencies": {
     "phaser": "3.90.0"

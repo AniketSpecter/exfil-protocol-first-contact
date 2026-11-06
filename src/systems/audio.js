@@ -18,26 +18,34 @@ export class AudioSystem {
   constructor(progression) {
     this.progression = progression;
     this.muted = progression.data.muted;
+    this.musicMuted = progression.data.musicMuted;
     this.buffers = new Map();
     this.cooldowns = new Map();
     this.stats = { decoded: 0, effects: 0, voices: [], failures: [] };
     this.voiceBusy = 0;
     this.voicePriority = 0;
     this.stepIndex = 0;
+    this.menuWanted = true;
+    this.uiCooldowns = new Map();
+    this.stats.ui = [];
+    document.addEventListener("visibilitychange", () => this.syncMenuMusic());
   }
   start() {
     try {
       if (!this.ctx) {
         this.ctx = new (window.AudioContext || window.webkitAudioContext)();
         this.master = this.ctx.createGain();
-        this.master.gain.value = this.muted ? 0 : 0.34;
+        this.master.gain.value = 0.34;
         this.master.connect(this.ctx.destination);
+        this.gameBus = this.ctx.createGain();
+        this.gameBus.gain.value = this.muted ? 0 : 1;
+        this.gameBus.connect(this.master);
         this.sfx = this.ctx.createGain();
         this.sfx.gain.value = 0.58;
-        this.sfx.connect(this.master);
+        this.sfx.connect(this.gameBus);
         this.voiceBus = this.ctx.createGain();
         this.voiceBus.gain.value = 1.1;
-        this.voiceBus.connect(this.master);
+        this.voiceBus.connect(this.gameBus);
         const count = this.ctx.sampleRate * 4,
           buffer = this.ctx.createBuffer(1, count, this.ctx.sampleRate),
           data = buffer.getChannelData(0);
@@ -54,7 +62,7 @@ export class AudioSystem {
         filter.frequency.value = 420;
         const gain = this.ctx.createGain();
         gain.gain.value = 0.14;
-        this.sea.connect(filter).connect(gain).connect(this.master);
+        this.sea.connect(filter).connect(gain).connect(this.gameBus);
         this.sea.start();
         this.ready = this.loadMedia();
       }
@@ -67,29 +75,81 @@ export class AudioSystem {
     this.muted = !this.muted;
     this.progression.data.muted = this.muted;
     this.progression.save();
-    if (this.master) this.master.gain.value = this.muted ? 0 : 0.34;
+    if (this.gameBus) this.gameBus.gain.value = this.muted ? 0 : 1;
     return this.muted;
+  }
+  toggleMusic() {
+    this.musicMuted = !this.musicMuted;
+    this.progression.data.musicMuted = this.musicMuted;
+    this.progression.save();
+    this.syncMenuMusic();
+    return this.musicMuted;
+  }
+  uiSound(kind = "confirm") {
+    if (!this.ctx || this.muted) return;
+    const now = this.ctx.currentTime;
+    if (now < (this.uiCooldowns.get(kind) || 0)) return;
+    this.uiCooldowns.set(kind, now + (kind === "hover" ? 0.16 : 0.07));
+    const sound = this.sample("ui-" + kind, {
+      volume: kind === "hover" ? 0.075 : kind === "denied" ? 0.18 : 0.16,
+    });
+    if (!sound)
+      this.tone(
+        kind === "back"
+          ? 440
+          : kind === "denied"
+            ? 180
+            : kind === "hover"
+              ? 900
+              : 700,
+        0.035,
+        "triangle",
+        kind === "hover" ? 0.018 : 0.045,
+        kind === "denied" ? 110 : 500,
+      );
+    this.stats.ui.push(kind);
+    if (this.stats.ui.length > 80) this.stats.ui.shift();
   }
   async loadMedia() {
     if (!OWNER_MEDIA) {
       this.mediaLoaded = true;
       return;
     }
-    await Promise.all(
-      SOUND_FILES.map(async (name) => {
-        try {
-          const response = await fetch(MEDIA_ROOT + "audio/" + name + ".wav");
-          if (!response.ok) throw Error(response.status);
-          const buffer = await this.ctx.decodeAudioData(
-            await response.arrayBuffer(),
+    try {
+      const indexResponse = await fetch(MEDIA_ROOT + "catalog.json");
+      if (!indexResponse.ok)
+        throw Error("Audio catalog " + indexResponse.status);
+      const catalog = await indexResponse.json();
+      this.musicReady = this.loadMenuMusic(catalog.menuMusic);
+      const response = await fetch(MEDIA_ROOT + catalog.audio.file);
+      if (!response.ok) throw Error("Runtime audio " + response.status);
+      const bank = await this.ctx.decodeAudioData(await response.arrayBuffer());
+      for (const name of SOUND_FILES) {
+        const cue = catalog.audio.cues[name];
+        if (!cue) throw Error("Missing sound cue: " + name);
+        const start = Math.round(
+          (cue.startFrame / catalog.audio.sampleRate) * bank.sampleRate,
+        );
+        const length = Math.round(
+          (cue.frames / catalog.audio.sampleRate) * bank.sampleRate,
+        );
+        const buffer = this.ctx.createBuffer(
+          bank.numberOfChannels,
+          length,
+          bank.sampleRate,
+        );
+        for (let channel = 0; channel < bank.numberOfChannels; channel++) {
+          buffer.copyToChannel(
+            bank.getChannelData(channel).subarray(start, start + length),
+            channel,
           );
-          this.buffers.set(name, buffer);
-          this.stats.decoded++;
-        } catch (error) {
-          this.stats.failures.push(name + ": " + error.message);
         }
-      }),
-    );
+        this.buffers.set(name, buffer);
+        this.stats.decoded++;
+      }
+    } catch (error) {
+      this.stats.failures.push("Runtime media: " + error.message);
+    }
     this.mediaLoaded = true;
     const buffer = this.buffers.get("ocean");
     if (buffer) {
@@ -98,9 +158,68 @@ export class AudioSystem {
       this.ocean.loop = true;
       const gain = this.ctx.createGain();
       gain.gain.value = 0.1;
-      this.ocean.connect(gain).connect(this.master);
+      this.ocean.connect(gain).connect(this.gameBus);
       this.ocean.start();
     }
+  }
+  async loadMenuMusic(entry) {
+    if (!entry) return;
+    try {
+      const response = await fetch(MEDIA_ROOT + entry.file);
+      if (!response.ok) throw Error("Menu score " + response.status);
+      this.menuBuffer = await this.ctx.decodeAudioData(
+        await response.arrayBuffer(),
+      );
+      this.syncMenuMusic();
+    } catch (error) {
+      this.stats.failures.push("Menu score: " + error.message);
+    }
+  }
+  setMenuMusic(enabled) {
+    if (enabled && !this.menuWanted) {
+      try {
+        this.voiceSource?.stop();
+        this.voiceSource?.disconnect();
+      } catch {
+        /* Already finished. */
+      }
+      this.voiceSource = null;
+      this.voiceBusy = 0;
+    }
+    this.menuWanted = enabled;
+    this.syncMenuMusic();
+  }
+  syncMenuMusic() {
+    if (!this.ctx || !this.menuBuffer) return;
+    clearTimeout(this.menuStopTimer);
+    const active = this.menuWanted && !document.hidden && !this.musicMuted;
+    if (!this.musicBus) {
+      this.musicBus = this.ctx.createGain();
+      this.musicBus.gain.value = 0;
+      this.musicBus.connect(this.master);
+    }
+    if (active && !this.menuSource) {
+      this.menuSource = this.ctx.createBufferSource();
+      this.menuSource.buffer = this.menuBuffer;
+      this.menuSource.loop = true;
+      this.menuSource.connect(this.musicBus);
+      this.menuSource.start();
+    }
+    const now = this.ctx.currentTime;
+    this.musicBus.gain.cancelScheduledValues(now);
+    this.musicBus.gain.setValueAtTime(this.musicBus.gain.value, now);
+    this.musicBus.gain.linearRampToValueAtTime(active ? 0.42 : 0, now + 0.4);
+    if (!active && this.menuSource)
+      this.menuStopTimer = setTimeout(() => {
+        if (this.menuWanted && !document.hidden && !this.musicMuted) return;
+        try {
+          this.menuSource?.stop();
+          this.menuSource?.disconnect();
+        } catch {
+          /* Already stopped. */
+        }
+        this.menuSource = null;
+      }, 450);
   }
   sample(
     name,
@@ -125,7 +244,7 @@ export class AudioSystem {
     return source;
   }
   voice(event, { priority = 1, position, listener } = {}) {
-    if (!OWNER_MEDIA || this.muted || !this.ctx) return;
+    if (!OWNER_MEDIA || this.muted || !this.ctx || this.menuWanted) return;
     const entry = VOICES[event];
     if (!entry) return;
     if (!this.mediaLoaded) {
@@ -207,7 +326,7 @@ export class AudioSystem {
     );
     gain.gain.setValueAtTime(volume, now);
     gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
-    osc.connect(gain).connect(this.master);
+    osc.connect(gain).connect(this.gameBus);
     osc.start();
     osc.stop(now + duration);
   }

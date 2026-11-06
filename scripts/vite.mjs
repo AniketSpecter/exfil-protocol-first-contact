@@ -40,7 +40,7 @@ if (project.includes("#")) {
 const { createServer, build, preview } = await import("vite");
 const { default: config } = await import("../vite.config.js");
 const portable = process.argv.includes("--portable");
-const ownerMedia = false;
+const ownerMedia = !portable && existsSync(join(root, "public/assets/game/catalog.json"));
 const options = {
   ...config,
   root,
@@ -59,7 +59,7 @@ const mode = process.argv[2] || "dev";
 if (mode === "build") {
   await build(options);
   const outputRoot = resolve(root, options.build.outDir);
-  for (const name of ["characters", ...(portable ? ["owner"] : [])]) {
+  for (const name of ["characters", "owner", ...(portable ? ["game"] : [])]) {
     const target = join(outputRoot, "assets", name);
     if (existsSync(target)) {
       const actualRoot = realpathSync(outputRoot),

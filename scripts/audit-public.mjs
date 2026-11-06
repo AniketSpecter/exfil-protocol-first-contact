@@ -1,5 +1,6 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { resolve, relative } from "node:path";
+import { createHash } from "node:crypto";
 const root = resolve("."),
   skip = new Set([
     "node_modules",
@@ -43,12 +44,18 @@ const rules = [
 ];
 for (const file of files) {
   const name = relative(root, file).replaceAll("\\", "/");
+  const approvedVoiceNotice =
+    name === "docs/licenses/Military-Voice-Pack-2-License.pdf" &&
+    createHash("sha256").update(readFileSync(file)).digest("hex") ===
+      "303fd122b39f7150cf0e49c65fc36edf8481a351092bf6c92bfb7906266d2ff2";
   if (
-    /(^|\/)(?:\.env(?:\..*)?|credentials|id_rsa|id_ed25519)$/.test(name) ||
-    /\.(?:pem|key|pfx|p12|log|zip|pdf)$/i.test(name)
+    !approvedVoiceNotice &&
+    (/(^|\/)(?:\.env(?:\..*)?|credentials|id_rsa|id_ed25519)$/.test(name) ||
+      /\.(?:pem|key|pfx|p12|log|zip|pdf)$/i.test(name))
   )
     findings.push(name + ": excluded private/archive file type");
   if (
+    !approvedVoiceNotice &&
     /(?:assets\/(?:owner|characters)|import-owner|source_private|manifest\.json|CS2D-Readme|Military-Voice-Pack)/i.test(
       name,
     )
@@ -71,15 +78,68 @@ for (const file of files) {
     if (pattern.test(text)) findings.push(name + ": " + label);
 }
 const source = readFileSync(resolve(root, "scripts/vite.mjs"), "utf8");
-if (!/const\s+ownerMedia\s*=\s*false\s*;/.test(source))
-  findings.push("Public build must force replacement media");
+if (
+  !/const\s+ownerMedia\s*=\s*!portable/.test(source) ||
+  !source.includes("public/assets/game/catalog.json")
+)
+  findings.push("Full-media build selection is missing");
+const media = resolve(root, "public/assets/game");
+const catalog = JSON.parse(
+  readFileSync(resolve(media, "catalog.json"), "utf8"),
+);
+const assets = [...catalog.artwork, catalog.audio, catalog.menuMusic];
+const allowed = new Set(["catalog.json", ...assets.map((a) => a.file)]);
+for (const item of assets) {
+  if (
+    !item ||
+    !item.file ||
+    item.file.includes("..") ||
+    item.file.startsWith("/")
+  ) {
+    findings.push("Invalid runtime asset entry");
+    continue;
+  }
+  const data = readFileSync(resolve(media, item.file));
+  if (
+    data.length !== item.bytes ||
+    createHash("sha256").update(data).digest("hex") !== item.sha256
+  )
+    findings.push(item.file + ": media inventory hash mismatch");
+}
+for (const file of files) {
+  const name = relative(media, file).replaceAll("\\", "/");
+  if (!name.startsWith("..") && !allowed.has(name))
+    findings.push(name + ": unlisted runtime asset");
+}
+const mp3 = readFileSync(resolve(media, catalog.menuMusic.file));
+if (
+  mp3.subarray(0, 3).toString() === "ID3" ||
+  mp3.subarray(-128, -125).toString() === "TAG" ||
+  mp3.subarray(-32, -24).toString() === "APETAGEX"
+)
+  findings.push("Menu score has embedded tags");
+const audio = readFileSync(resolve(media, catalog.audio.file));
+for (let at = 12; at + 8 <= audio.length; ) {
+  const tag = audio.toString("ascii", at, at + 4),
+    length = audio.readUInt32LE(at + 4);
+  if (!["fmt ", "data"].includes(tag))
+    findings.push("Audio bank contains metadata: " + tag);
+  at += 8 + length + (length % 2);
+}
+if (
+  catalog.artwork.length !== 35 ||
+  Object.keys(catalog.audio.cues).length !== 31
+)
+  findings.push("Incomplete runtime media");
 for (const out of ["dist", "dist-portable"])
   if (existsSync(resolve(root, out, "assets/owner")))
-    findings.push(out + ": imported game media in output");
+    findings.push(out + ": private import folder present");
+if (existsSync(resolve(root, "dist-portable/assets/game")))
+  findings.push("Replacement build still contains full runtime media");
 if (findings.length) {
   console.error(findings.join("\n"));
   process.exitCode = 1;
 } else
   console.log(
-    `Public audit passed: ${files.length} files; no matched secrets, workstation paths, imported media or PNG metadata.`,
+    `Public audit passed: ${files.length} files; runtime-media hashes verified; no matched secrets, workstation paths, private imports or embedded image/audio tags.`,
   );

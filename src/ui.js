@@ -36,20 +36,84 @@ export class Interface {
     this.ready = false;
     this.selectedMission = progression.data.lastMission || "landing";
     this.mode = "solo";
+    this.bindUISounds();
     this.root.innerHTML =
       '<div class="loading"><div class="wordmark">EXFIL PROTOCOL</div><p>ESTABLISHING SECURE CONNECTION…</p></div>';
   }
   chrome() {
-    return `<header class="topbar"><div class="brand">${star}<span>SFA<span class="brand-small">SPECIAL FORCE AUTHORITY</span></span></div><div class="top-mid"><span class="status-dot"></span> OPERATION SILENT TIDE <b>/</b> MON BREAKWATER</div><div class="utilities"><button id="audio-btn" class="icon-button" aria-label="Toggle audio">${this.audio.muted ? "AUDIO OFF" : "AUDIO ON"}</button><button id="fullscreen-btn" class="icon-button" aria-label="Toggle fullscreen">⛶ <span>FULLSCREEN</span></button></div></header>`;
+    return `<header class="topbar"><div class="brand">${star}<span>SFA<span class="brand-small">SPECIAL FORCE AUTHORITY</span></span></div><div class="top-mid"><span class="status-dot"></span> OPERATION SILENT TIDE <b>/</b> MON BREAKWATER</div><div class="utilities"><button id="audio-btn" class="icon-button" aria-label="Toggle audio">${this.audio.muted ? "AUDIO OFF" : "AUDIO ON"}</button><button id="music-btn" class="icon-button" aria-label="Toggle menu music" aria-pressed="${!this.audio.musicMuted}">${this.audio.musicMuted ? "MUSIC OFF" : "MUSIC ON"}</button><button id="fullscreen-btn" class="icon-button" aria-label="Toggle fullscreen">⛶ <span>FULLSCREEN</span></button></div></header>`;
+  }
+  bindUISounds() {
+    this.root.addEventListener(
+      "click",
+      (event) => {
+        const button = event.target.closest("button,[role=button]");
+        if (
+          !button ||
+          button.closest("#touch-editor") ||
+          ["audio-btn", "setting-audio", "music-btn", "setting-music"].includes(
+            button.id,
+          )
+        )
+          return;
+        this.audio.start();
+        const back = /back|close|cancel|abandon|^menu$/.test(
+          button.id + " " + button.className,
+        );
+        const toggle =
+          /quiet|setting|mode|map/.test(button.id) ||
+          button.hasAttribute("data-mode");
+        this.audio.uiSound(
+          button.disabled
+            ? "denied"
+            : back
+              ? "back"
+              : toggle
+                ? "toggle"
+                : "confirm",
+        );
+      },
+      true,
+    );
+    this.root.addEventListener("pointerover", (event) => {
+      if (event.pointerType !== "mouse") return;
+      const button = event.target.closest("button");
+      if (
+        !button ||
+        button.contains(event.relatedTarget) ||
+        button.disabled ||
+        button.closest(".touch-controls,#touch-editor")
+      )
+        return;
+      this.audio.uiSound("hover");
+    });
+    this.root.addEventListener(
+      "pointerdown",
+      (event) => {
+        if (event.target.closest("button:disabled,.contract.locked"))
+          this.audio.uiSound("denied");
+      },
+      true,
+    );
   }
   bindChrome() {
     document.querySelector("#audio-btn")?.addEventListener("click", () => {
       this.audio.start();
       this.audio.toggle();
+      this.audio.uiSound("toggle");
       document.querySelector("#audio-btn").textContent = this.audio.muted
         ? "AUDIO OFF"
         : "AUDIO ON";
     });
+    const music = document.querySelector("#music-btn");
+    if (music)
+      music.onclick = () => {
+        this.audio.start();
+        this.audio.toggleMusic();
+        music.textContent = this.audio.musicMuted ? "MUSIC OFF" : "MUSIC ON";
+        music.setAttribute("aria-pressed", String(!this.audio.musicMuted));
+        this.audio.uiSound("toggle");
+      };
     this.display.bind(document.querySelector("#fullscreen-btn"));
   }
   displayMessage(message) {
@@ -210,7 +274,7 @@ export class Interface {
       title.querySelector("img").onload = () => this.fitMenu();
     }
     const build = this.root.querySelector(".menu-footer>span:last-child");
-    if (build) build.textContent = "BUILD 03.1 // OPERATION SILENT TIDE";
+    if (build) build.textContent = "BUILD 03.1.1 // OPERATION SILENT TIDE";
     this.menuObserver?.disconnect();
     this.fitMenu();
   }
@@ -249,6 +313,7 @@ export class Interface {
     );
   }
   showOperations() {
+    this.audio.setMenuMusic(true);
     this.root.className = "";
     const save = this.progression.data,
       level = levelProgress(save.xp);
@@ -275,8 +340,21 @@ export class Interface {
   showUtility(kind) {
     const overlay = document.createElement("div");
     overlay.className = "modal-shade utility-modal";
-    overlay.innerHTML = `<section class="pause-panel"><div class="eyebrow">FIELD MANUAL</div><h2>${kind === "controls" ? "CONTROLS" : "SETTINGS"}</h2>${kind === "controls" ? `<div class="controls-grid">${this.controlGuide()}</div><p class="fineprint">Use cover. A full uplink preserves evidence but sends patrols to your position. Phones play in landscape.</p>` : `<p>Audio and fullscreen remain available in the top bar. Current audio: ${this.audio.muted ? "muted" : "on"}.</p><button class="secondary" id="setting-audio">TOGGLE AUDIO</button><button class="secondary" id="customize-touch">CUSTOMIZE TOUCH CONTROLS</button><button class="secondary" id="setting-touch">${this.touchMode ? "TOUCH CONTROLS ENABLED" : "ENABLE TOUCH CONTROLS"}</button><p class="fineprint">Progress saves locally in this browser. If graphics fail, open the game with ?renderer=canvas. No accounts, purchases or telemetry.</p>`}<button class="primary utility-close">CLOSE <span>×</span></button></section>`;
+    overlay.innerHTML = `<section class="pause-panel"><div class="eyebrow">FIELD MANUAL</div><h2>${kind === "controls" ? "CONTROLS" : "SETTINGS"}</h2>${kind === "controls" ? `<div class="controls-grid">${this.controlGuide()}</div><p class="fineprint">Use cover. A full uplink preserves evidence but sends patrols to your position. Phones play in landscape.</p>` : `<p>Audio controls effects and voices; Music controls the menu soundtrack separately. Fullscreen is in the top bar. Current audio: ${this.audio.muted ? "muted" : "on"}.</p><button class="secondary" id="setting-audio">${this.audio.muted ? "AUDIO OFF" : "AUDIO ON"}</button><button class="secondary" id="setting-music">${this.audio.musicMuted ? "MUSIC OFF" : "MUSIC ON"}</button><button class="secondary" id="customize-touch">CUSTOMIZE TOUCH CONTROLS</button><button class="secondary" id="setting-touch">${this.touchMode ? "TOUCH CONTROLS ENABLED" : "ENABLE TOUCH CONTROLS"}</button><p class="fineprint">Progress saves locally in this browser. If graphics fail, open the game with ?renderer=canvas. No accounts, purchases or telemetry.</p>`}<button class="primary utility-close">CLOSE <span>×</span></button></section>`;
     this.root.append(overlay);
+    const music = overlay.querySelector("#setting-music");
+    if (music)
+      music.onclick = () => {
+        this.audio.start();
+        this.audio.toggleMusic();
+        music.textContent = this.audio.musicMuted ? "MUSIC OFF" : "MUSIC ON";
+        const top = document.querySelector("#music-btn");
+        if (top) {
+          top.textContent = music.textContent;
+          top.setAttribute("aria-pressed", String(!this.audio.musicMuted));
+        }
+        this.audio.uiSound("toggle");
+      };
     const editor = overlay.querySelector("#customize-touch");
     if (editor) editor.onclick = () => this.customizeTouch();
     const input = overlay.querySelector("#setting-touch");
@@ -291,6 +369,7 @@ export class Interface {
       audio.onclick = () => {
         this.audio.start();
         this.audio.toggle();
+        this.audio.uiSound("toggle");
         audio.textContent = this.audio.muted ? "AUDIO OFF" : "AUDIO ON";
         document.querySelector("#audio-btn").textContent = audio.textContent;
       };
@@ -326,13 +405,16 @@ export class Interface {
     s.resetInput();
   }
   showMenu() {
+    this.audio.setMenuMusic(true);
+    clearTimeout(this.voiceTimer);
+    document.getElementById("voice-caption")?.remove();
     this.clearPauseKey();
     if (this.titleKey) document.removeEventListener("keydown", this.titleKey);
     this.ready = true;
     this.scene = null;
     const save = this.progression.data;
     this.root.className = "";
-    this.root.innerHTML = `<main class="menu screen">${this.chrome()}<div class="menu-stage"><section class="menu-copy"><div class="eyebrow">SFA INCIDENT ARCHIVE / 001</div><h1>EXFIL<br>PROTOCOL<span>FIRST CONTACT</span></h1><div class="operation-label">OPERATION SILENT TIDE</div><p class="menu-description">Four went in.<br>The record says none returned.</p><p class="menu-subcopy">Before the silence, there was a first contract.<br>Recover the evidence. Decide what survives.</p><button class="primary" id="new-operation">${save.completions ? "DEPLOY AGAIN" : "NEW OPERATION"}<span>&nearr;</span></button><div class="session-note"><span class="status-dot"></span> SINGLE PLAYER <b>&middot;</b> SHORT TACTICAL RAID</div></section><section class="menu-recon" aria-label="Contract reconnaissance"><div class="recon-heading"><span>MON BREAKWATER / RECON OVERVIEW</span><span>N &uarr;</span></div><div class="menu-map"></div><aside class="mission-card"><div class="eyebrow">ACTIVE CONTRACT <span>01 / 02</span></div><h2>SILENT LANDING</h2><p>Mon Breakwater Island<br><strong>Coastal infiltration</strong></p><div class="card-rule"></div><div class="card-row"><span>ASSIGNMENT</span><b>Recover classified manifest</b></div><div class="card-row"><span>EXFIL</span><b>Southern dock</b></div><div class="card-row"><span>THREAT</span><b class="warning-text">PMC patrols confirmed</b></div>${save.signalFilter ? '<div class="upgrade-tag">SCRAMBLER LEVEL 1 &middot; MISSION 02 AVAILABLE</div>' : ""}</aside></section></div><footer class="menu-footer"><span>VIPER ONE <b>/</b> RECONNAISSANCE DETACHMENT</span><span>${save.xp.toLocaleString()} XP <b>/</b> ${save.evidence.length} EVIDENCE BANKED</span><button class="text-button" id="credits">INTEL & CREDITS</button><span>BUILD 03.1 // OPERATION SILENT TIDE</span></footer></main>`;
+    this.root.innerHTML = `<main class="menu screen">${this.chrome()}<div class="menu-stage"><section class="menu-copy"><div class="eyebrow">SFA INCIDENT ARCHIVE / 001</div><h1>EXFIL<br>PROTOCOL<span>FIRST CONTACT</span></h1><div class="operation-label">OPERATION SILENT TIDE</div><p class="menu-description">Four went in.<br>The record says none returned.</p><p class="menu-subcopy">Before the silence, there was a first contract.<br>Recover the evidence. Decide what survives.</p><button class="primary" id="new-operation">${save.completions ? "DEPLOY AGAIN" : "NEW OPERATION"}<span>&nearr;</span></button><div class="session-note"><span class="status-dot"></span> SINGLE PLAYER <b>&middot;</b> SHORT TACTICAL RAID</div></section><section class="menu-recon" aria-label="Contract reconnaissance"><div class="recon-heading"><span>MON BREAKWATER / RECON OVERVIEW</span><span>N &uarr;</span></div><div class="menu-map"></div><aside class="mission-card"><div class="eyebrow">ACTIVE CONTRACT <span>01 / 02</span></div><h2>SILENT LANDING</h2><p>Mon Breakwater Island<br><strong>Coastal infiltration</strong></p><div class="card-rule"></div><div class="card-row"><span>ASSIGNMENT</span><b>Recover classified manifest</b></div><div class="card-row"><span>EXFIL</span><b>Southern dock</b></div><div class="card-row"><span>THREAT</span><b class="warning-text">PMC patrols confirmed</b></div>${save.signalFilter ? '<div class="upgrade-tag">SCRAMBLER LEVEL 1 &middot; MISSION 02 AVAILABLE</div>' : ""}</aside></section></div><footer class="menu-footer"><span>VIPER ONE <b>/</b> RECONNAISSANCE DETACHMENT</span><span>${save.xp.toLocaleString()} XP <b>/</b> ${save.evidence.length} EVIDENCE BANKED</span><button class="text-button" id="credits">INTEL & CREDITS</button><span>BUILD 03.1.1 // OPERATION SILENT TIDE</span></footer></main>`;
     this.bindChrome();
     document.querySelector("#new-operation").onclick = () =>
       this.showBriefing();
@@ -370,6 +452,7 @@ export class Interface {
     if (note) note.textContent = "SCRAMBLER LEVEL 1 · MISSION 02 AVAILABLE";
   }
   showBriefing() {
+    this.audio.setMenuMusic(true);
     const replay = this.progression.data.completions > 0;
     this.root.innerHTML = `<main class="briefing screen">${this.chrome()}<div class="briefing-grid"><section><div class="eyebrow">MISSION BRIEF / ${replay ? "RECONTRACT" : "FIRST INSERTION"}</div><h1 class="section-title">SILENT<br>LANDING<span>01 / MON BREAKWATER ISLAND</span></h1><p class="brief-lead">Unmarked vessels. A private army.<br>Orders that no longer add up.</p><p class="muted body-copy">You are Viper, lead operator of SFA recon squad Viper One. Enter the coastal installation, recover its shipping manifest and return to the southern dock. Doc, Spectre and Relay support you over comms.</p><ol class="steps"><li><span>01</span><div><b>RECOVER</b><p>Find the classified data at the warehouse.</p></div></li><li><span>02</span><div><b>DECIDE WHAT SURVIVES</b><p>Transmit to bank the evidence and reveal your position, or carry it out quietly and risk losing it.</p></div></li><li><span>03</span><div><b>EXTRACT</b><p>Call the boat at the southern dock. Survive six seconds.</p></div></li></ol>${replay ? '<div class="replay-note"><b>SIGNAL FILTER EQUIPPED</b><p>Transmit in 2.5s instead of 4s. A Nightglass fragment is now available at the northern relay. The north patrol has moved.</p></div>' : ""}<div class="brief-buttons"><button class="primary" id="play">PLAY OPERATION <span>→</span></button><button class="secondary" id="back">BACK</button></div></section><aside class="brief-right"><div class="brief-map">${mapSVG({ route: true })}<div class="brief-map-caption">RECON OVERVIEW <span>NOT TO NAVIGATIONAL SCALE</span></div></div><div class="controls-panel"><div class="eyebrow">FIELD CONTROLS</div><div class="controls-grid">${control("W A S D", "Move")}${control("MOUSE", "Aim")}${control("LMB", "Fire")}${control("R", "Reload")}${control("E", "Interact")}${control("HOLD T", "Transmit · stand still")}${control("SHIFT", "Quiet movement")}${control("M / ESC", "Map / pause")}</div></div></aside></div></main>`;
     this.bindChrome();
@@ -468,6 +551,7 @@ export class Interface {
         `<div class="eyebrow">LANDSCAPE TOUCH CONTROLS</div><div class="controls-grid">${this.controlGuide()}</div>`;
   }
   deploy() {
+    this.audio.setMenuMusic(false);
     this.audio.start();
     this.audio.play("confirm");
     this.game.scene.stop("Boot");
@@ -965,9 +1049,10 @@ export class Interface {
     };
   }
   showCredits() {
+    this.audio.setMenuMusic(true);
     this.clearPauseKey();
     this.root.className = "";
-    this.root.innerHTML = `<main class="credits screen">${this.chrome()}<section class="credits-content"><header class="credits-intro"><div class="eyebrow">SFA ARCHIVE / PROJECT DOSSIER</div><h1 class="section-title">INTEL &amp; CREDITS</h1><p>Created by <b>Aniket [UGZ]</b>. EXFIL PROTOCOL: FIRST CONTACT follows Viper One's first reconnaissance mission on Mon Breakwater Island, before the squad falls silent.</p></header><div class="credits-grid"><section class="credit-section"><h2>OPERATION SILENT TIDE</h2><p>Recover the shipping manifest in Silent Landing. Follow the evidence by boat to Lighthouse Ridge in Dead Frequency. Transmit what you find or risk carrying it home. Doc and Spectre support the optional squad deployment.</p></section><section class="credit-section"><h2>WORLD &amp; INSPIRATION</h2><p>Inspired by the tactical atmosphere of Counter-Strike 1.6 and the island geography of <b>de_mon by MaMuS</b>. This independent 2D interpretation has its own missions and routes. EXFIL's setting, story, title artwork and logo are presented by Aniket [UGZ].</p></section><section class="credit-section"><h2>ART &amp; VISUAL INSPIRATION</h2><p>Counter-Strike 1.6 inspired the tactical look, atmosphere and sound direction. Character and weapon designs were developed with Auto Sprite AI. EXFIL's interface, island layout and animated boat journey were created for this game.</p></section><section class="credit-section"><h2>DEVELOPMENT &amp; TECHNOLOGY</h2><p>Built with Phaser, JavaScript and Vite. AI-assisted programming helped bring the gameplay systems, interface and prototype to life, with creative direction and game design by Aniket [UGZ]. Enemies use authored behavior and pathfinding. Progress and control preferences stay in your browser; no accounts, purchases or analytics.</p></section></div><div class="brief-buttons"><button class="primary" id="credits-back">BACK TO OPERATIONS <span>&rarr;</span></button><button class="secondary" id="reset-progress" aria-expanded="false" aria-controls="reset-confirm">RESET SAVED PROGRESS</button></div><div id="reset-confirm" class="hidden"><p>Delete this browser's XP, saved evidence and mission unlocks? This cannot be undone.</p><button class="secondary" id="confirm-reset">DELETE PROGRESS</button><button class="text-button" id="cancel-reset">CANCEL</button></div></section></main>`;
+    this.root.innerHTML = `<main class="credits screen">${this.chrome()}<section class="credits-content"><header class="credits-intro"><div class="eyebrow">SFA ARCHIVE / PROJECT DOSSIER</div><h1 class="section-title">INTEL &amp; CREDITS</h1><p>Created by <b>Aniket [UGZ]</b>. EXFIL PROTOCOL: FIRST CONTACT follows Viper One's first reconnaissance mission on Mon Breakwater Island, before the squad falls silent.</p></header><div class="credits-grid"><section class="credit-section"><h2>OPERATION SILENT TIDE</h2><p>Recover the shipping manifest in Silent Landing. Follow the evidence by boat to Lighthouse Ridge in Dead Frequency. Transmit what you find or risk carrying it home. Doc and Spectre support the optional squad deployment.</p></section><section class="credit-section"><h2>WORLD &amp; INSPIRATION</h2><p>Inspired by the tactical atmosphere of Counter-Strike 1.6 and the island geography of <b>de_mon by MaMuS</b>. This independent 2D interpretation has its own missions and routes. EXFIL's setting, story, title artwork and logo are presented by Aniket [UGZ].</p></section><section class="credit-section"><h2>ART &amp; VISUAL INSPIRATION</h2><p>Counter-Strike 1.6 inspired the tactical look, atmosphere and sound direction. Character and weapon designs were developed with Auto Sprite AI. EXFIL's interface, island layout and animated boat journey were created for this game. Selected ambience, radio and music come from the supplied EXFIL audio library.</p></section><section class="credit-section"><h2>DEVELOPMENT &amp; TECHNOLOGY</h2><p>Built with Phaser, JavaScript and Vite. AI-assisted programming helped bring the gameplay systems, interface and prototype to life, with creative direction and game design by Aniket [UGZ]. Enemies use authored behavior and pathfinding. Progress and control preferences stay in your browser; no accounts, purchases or analytics.</p></section></div><div class="brief-buttons"><button class="primary" id="credits-back">BACK TO OPERATIONS <span>&rarr;</span></button><button class="secondary" id="reset-progress" aria-expanded="false" aria-controls="reset-confirm">RESET SAVED PROGRESS</button></div><div id="reset-confirm" class="hidden"><p>Delete this browser's XP, saved evidence and mission unlocks? This cannot be undone.</p><button class="secondary" id="confirm-reset">DELETE PROGRESS</button><button class="text-button" id="cancel-reset">CANCEL</button></div></section></main>`;
     this.bindChrome();
     document.querySelector("#credits-back").onclick = () => this.showMenu();
     const reset = document.querySelector("#reset-progress"),
@@ -985,8 +1070,10 @@ export class Interface {
     document.querySelector("#confirm-reset").onclick = () => {
       this.progression.reset();
       this.audio.muted = this.progression.data.muted;
-      if (this.audio.master)
-        this.audio.master.gain.value = this.audio.muted ? 0 : 0.34;
+      if (this.audio.gameBus)
+        this.audio.gameBus.gain.value = this.audio.muted ? 0 : 1;
+      this.audio.musicMuted = this.progression.data.musicMuted;
+      this.audio.syncMenuMusic();
       this.selectedMission = "landing";
       this.showMenu();
     };

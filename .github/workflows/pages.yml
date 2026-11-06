@@ -23,16 +23,18 @@ jobs:
       - run: npm ci
       - run: npm run audit:public
       - run: npm test
-      - run: npm run build:portable
+      - run: npm run build
       - name: Include attribution and notices
         run: |
-          cp ATTRIBUTION.md dist-portable/ATTRIBUTION.md
-          cp RIGHTS.md dist-portable/RIGHTS.md
-          cp docs/licenses/Phaser-LICENSE.md dist-portable/Phaser-LICENSE.md
+          cp ATTRIBUTION.md dist/ATTRIBUTION.md
+          cp RIGHTS.md dist/RIGHTS.md
+          cp docs/licenses/Phaser-LICENSE.md dist/Phaser-LICENSE.md
+          cp docs/licenses/ThirdPartyGameMedia.txt dist/ThirdPartyGameMedia.txt
+          cp docs/licenses/Military-Voice-Pack-2-License.pdf dist/Military-Voice-Pack-2-License.pdf
       - uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
-          path: dist-portable
+          path: dist
   deploy:
     needs: build
     runs-on: ubuntu-latest

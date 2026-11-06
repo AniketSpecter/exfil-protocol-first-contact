@@ -1,3 +1,31 @@
+body.touch-mode .hud-right > #pause-button {
+  right: 186px;
+}
+#setting-music {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+}
+@media (max-width: 600px) {
+  body.touch-mode .screen > .topbar .brand {
+    font-size: 17px;
+  }
+  body.touch-mode .screen > .topbar .brand svg {
+    width: 32px;
+    height: 28px;
+  }
+  body.touch-mode .screen > .topbar .brand-small {
+    display: none;
+  }
+  body.touch-mode .screen > .topbar .utilities {
+    gap: 8px;
+  }
+  body.touch-mode .screen > .topbar .icon-button {
+    font-size: 8px;
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
 :root {
   font-family: "Segoe UI", Arial, sans-serif;
   color: #e1e6d9;
