@@ -1,0 +1,14 @@
+node_modules/
+dist/
+dist-portable/
+qa/
+release/
+.env
+.env.*
+!.env.example
+*.log
+*.pem
+*.key
+public/assets/owner/
+public/assets/characters/
+.DS_Store

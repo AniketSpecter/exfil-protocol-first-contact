@@ -1,0 +1,44 @@
+{
+  "name": "exfil-protocol-first-contact",
+  "version": "3.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/vite.mjs dev",
+    "build": "node scripts/vite.mjs build",
+    "preview": "node scripts/vite.mjs preview",
+    "test": "node --test tests/systems.test.js tests/touch-layout.test.js",
+    "test:browser": "node scripts/prepare-qa.mjs && node tests/campaign.mjs",
+    "test:mobile": "node scripts/prepare-qa.mjs && node tests/mobile.mjs",
+    "test:production": "node scripts/prepare-qa.mjs && node tests/production.mjs",
+    "qa:live": "node scripts/prepare-qa.mjs && node scripts/live-preview.mjs",
+    "dev:lan": "node scripts/vite.mjs dev --host 0.0.0.0",
+    "build:portable": "node scripts/vite.mjs build --portable",
+    "dev:portable": "node scripts/vite.mjs dev --portable",
+    "test:layouts": "node scripts/prepare-qa.mjs && node tests/layouts.mjs",
+    "test:presentation": "node scripts/prepare-qa.mjs && node tests/presentation.mjs",
+    "test:recovery": "node scripts/prepare-qa.mjs && node tests/recovery.mjs",
+    "test:launch": "node scripts/prepare-qa.mjs && node tests/launch-layout.mjs",
+    "test:touch-route": "node scripts/prepare-qa.mjs && node tests/touch-route.mjs",
+    "test:touch-ux": "node scripts/prepare-qa.mjs && node tests/touch-ux.mjs",
+    "test:touch-editor": "node scripts/prepare-qa.mjs && node tests/touch-editor.mjs",
+    "test:weapons-journey": "node scripts/prepare-qa.mjs && node tests/weapons-journey.mjs",
+    "test:mobile-pages": "node scripts/prepare-qa.mjs && node tests/mobile-pages.mjs",
+    "audit:public": "node scripts/audit-public.mjs"
+  },
+  "dependencies": {
+    "phaser": "3.90.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.1",
+    "fflate": "0.8.3",
+    "vite": "6.4.5"
+  },
+  "author": "Aniket [UGZ]",
+  "description": "Two-mission tactical extraction browser game with desktop and customizable landscape touch controls.",
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AniketSpecter/exfil-protocol-first-contact.git"
+  }
+}
